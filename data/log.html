@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Energy Monitor Dashboard</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    nav a { margin-right: 1em; }
+    section { margin-top: 2em; padding: 1em; border: 1px solid #ccc; }
+  </style>
+  <script type="module" src="/js/clamp-editor.js"></script>
+  <script type="module" src="/js/telemetry-mock.js"></script>
+</head>
+<body>
+  <h1>Energy Monitor Dashboard</h1>
+  <nav>
+    <a href="/logs">Logs</a>
+    <a href="/monitor">Monitor</a>
+    <a href="/charging">Charging</a>
+    <a href="/settings">Settings</a>
+  </nav>
+
+  <section id="clamp-editor">
+    <h2>CT Clamp Editor</h2>
+    <!-- clamp-editor.js will populate this -->
+  </section>
+
+  <section id="telemetry-preview">
+    <h2>Live Telemetry Preview</h2>
+    <!-- telemetry-mock.js will populate this -->
+  </section>
+</body>
+</html>

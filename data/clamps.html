@@ -1,0 +1,36 @@
+<!-- views/clamps.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clamp Configuration</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/log">Logs</a>
+    <a href="/monitor">Monitor</a>
+    <a href="/clamps">Clamps</a>
+    <a href="/charging">Charging</a>
+    <a href="/settings">Settings</a>
+  </nav>
+
+  <h1>CT Clamp Editor</h1>
+  <div id="clamp-editor"></div>
+
+  <h2>Live Telemetry Preview</h2>
+  <ul id="telemetry-list"></ul>
+
+  <script type="module">
+    import { renderClampEditor } from '/js/clamp-editor.js';
+    import { startTelemetryLoop } from '/js/telemetry-mock.js';
+
+    fetch('/clamps/config')
+      .then(res => res.json())
+      .then(config => {
+        renderClampEditor(config);
+        startTelemetryLoop(config);
+      });
+  </script>
+</body>
+</html>

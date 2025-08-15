@@ -1,0 +1,45 @@
+{
+  "refoss_units": [
+    {
+      "id": "unit_01",
+      "location": "Exterior Panel",
+      "type": "grid_monitor",
+      "clamps": ["clamp_01", "clamp_02"]
+    },
+    {
+      "id": "unit_02",
+      "location": "Interior Panel",
+      "type": "load_monitor",
+      "clamps": ["clamp_03"]
+    }
+  ],
+  "ct_clamps": [
+    {
+      "id": "clamp_01",
+      "label": "Main Grid Feed",
+      "refoss_unit": "unit_01",
+      "channel": 1,
+      "role": "grid",
+      "enabled": true,
+      "calibration_factor": 1.0
+    },
+    {
+      "id": "clamp_02",
+      "label": "Solar Inverter",
+      "refoss_unit": "unit_01",
+      "channel": 2,
+      "role": "solar",
+      "enabled": true,
+      "calibration_factor": 1.0
+    },
+    {
+      "id": "clamp_03",
+      "label": "Kitchen Circuit",
+      "refoss_unit": "unit_02",
+      "channel": 1,
+      "role": "load",
+      "enabled": true,
+      "calibration_factor": 1.0
+    }
+  ]
+}

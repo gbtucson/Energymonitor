@@ -1,0 +1,13 @@
+{
+  "pvWatts": 3200,
+  "homeWatts": 1800,
+  "evWatts": 1400,
+  "relayState": true,
+  "manualOverride": false,
+  "manualState": false,
+  "scheduleEnabled": true,
+  "scheduleMode": "Regular",
+  "chargeRateWatts": 1400,
+  "chargingTimerActive": false,
+  "chargingTimeRemaining": 0
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Schedule Manager</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #eaeaea;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .schedule-block {
+      background-color: #d3d3d3;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .divider {
+      height: 4px;
+      background-color: white;
+      margin: 20px 0;
+      border-radius: 2px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+    }
+
+    .time-pair {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .time-pair input {
+      flex: 1;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    #deleteScheduleBtn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #deleteScheduleBtn:hover {
+      background-color: #d32f2f;
+    }
+
+    #saveScheduleBtn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #saveScheduleBtn:hover {
+      background-color: #388E3C;
+    }
+
+    #status {
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h2>Create/Edit Schedule</h2>
+
+  <div class="schedule-block">
+    <!-- Schedule selector -->
+    <label for="scheduleSelector">Select Schedule:</label>
+    <select id="scheduleSelector"></select>
+
+    <form id="scheduleForm">
+      <label for="name">Schedule Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" name="startDate" required>
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" name="endDate" required>
+
+      <label>Section 1:</label>
+      <div class="time-pair">
+        <input type="time" id="section1Start" name="section1Start">
+        <input type="time" id="section1End" name="section1End">
+      </div>
+
+      <label>Section 2:</label>
+      <div class="time-pair">
+        <input type="time" id="section2Start" name="section2Start">
+        <input type="time" id="section2End" name="section2End">
+      </div>
+
+      <label>Section 3:</label>
+      <div class="time-pair">
+        <input type="time" id="section3Start" name="section3Start">
+        <input type="time" id="section3End" name="section3End">
+      </div>
+
+      <div class="button-row">
+        <button id="saveScheduleBtn" type="submit">Save Schedule</button>
+        <button id="deleteScheduleBtn" type="button">Delete Schedule</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
+
+  <!-- Future schedule blocks can be added below -->
+
+  <p id="status"></p>
+
+  <script src="schedule.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Energy Monitor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+    h1 { margin-bottom: 10px; }
+    .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .label { font-weight: bold; }
+    .value { float: right; }
+  </style>
+</head>
+<body>
+  <h1>⚡ Energy Monitor</h1>
+
+  <div class="card"><span class="label">PV Production:</span> <span class="value" id="pvWatts">--</span> W</div>
+  <div class="card"><span class="label">Home Usage:</span> <span class="value" id="homeWatts">--</span> W</div>
+  <div class="card"><span class="label">EV Draw:</span> <span class="value" id="evWatts">--</span> W</div>
+  <div class="card"><span class="label">Charge Rate:</span> <span class="value" id="chargeRateWatts">--</span> W</div>
+
+  <div class="card"><span class="label">Relay State:</span> <span class="value" id="relayState">--</span></div>
+  <div class="card"><span class="label">Schedule Mode:</span> <span class="value" id="scheduleMode">--</span></div>
+  <div class="card"><span class="label">Manual Override:</span> <span class="value" id="manualOverride">--</span></div>
+  <div class="card"><span class="label">Charging Timer:</span> <span class="value" id="chargingTimer">--</span></div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

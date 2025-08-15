@@ -1,0 +1,14 @@
+<h2>Charging Control</h2>
+
+<div>
+  <p><strong>PV Output:</strong> <span id="pvWatts">--</span> W</p>
+  <p><strong>House Usage:</strong> <span id="houseWatts">--</span> W</p>
+  <p><strong>Net Surplus:</strong> <span id="netSurplus">--</span> W</p>
+  <p><strong>Aggressiveness:</strong> <span id="aggressiveness">--</span></p>
+</div>
+
+<h3>Settings</h3>
+<label for="pvThreshold">Minimum PV to Charge (W):</label>
+<input type="number" id="pvThreshold" value="200">
+
+<button onclick="saveChargingSettings()">Save Settings</button>
