@@ -1,14 +1,100 @@
-<h2>Charging Control</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Charging Control v1.2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div>
-  <p><strong>PV Output:</strong> <span id="pvWatts">--</span> W</p>
-  <p><strong>House Usage:</strong> <span id="houseWatts">--</span> W</p>
-  <p><strong>Net Surplus:</strong> <span id="netSurplus">--</span> W</p>
-  <p><strong>Aggressiveness:</strong> <span id="aggressiveness">--</span></p>
-</div>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch("/charging-settings.json")
+        .then(res => {
+          console.log("Fetch status:", res.status);
+          if (!res.ok) throw new Error("Failed to fetch config");
+          return res.json();
+        })
+        .then(data => {
+          console.log("Loaded config:", data);
+          const input = document.getElementById("minimumPVWattsToCharge");
+          if (input && data.minimumPVWattsToCharge !== undefined) {
+            input.value = data.minimumPVWattsToCharge;
+          } else {
+            console.warn("Config missing 'minimumPVWattsToCharge'");
+          }
+        })
+        .catch(err => console.error("Failed to load config:", err));
+    });
 
-<h3>Settings</h3>
-<label for="pvThreshold">Minimum PV to Charge (W):</label>
-<input type="number" id="pvThreshold" value="200">
+    function saveChargingSettings() {
+      const input = document.getElementById("minimumPVWattsToCharge");
+      if (!input) {
+        console.error("Input field 'minimumPVWattsToCharge' not found!");
+        alert("Form error: input field missing.");
+        return;
+      }
 
-<button onclick="saveChargingSettings()">Save Settings</button>
+      const newValue = parseInt(input.value);
+      if (isNaN(newValue)) {
+        alert("Please enter a valid number.");
+        return;
+      }
+
+      const payload = { minimumPVWattsToCharge: newValue };
+
+      fetch("/api/save-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to save");
+        return res.json();
+      })
+      .then(data => {
+        console.log("Saved:", data);
+        alert("Settings saved successfully.");
+      })
+      .catch(err => {
+        console.error("Save failed:", err);
+        alert("Failed to save settings.");
+      });
+    }
+
+    window.addEventListener("load", () => {
+      fetch("/charging-settings.json?_=" + Date.now())
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch config");
+          return res.json();
+        })
+        .then(data => {
+          const input = document.getElementById("minimumPVWattsToCharge");
+          if (input) {
+            const newValue = data.minimumPVWattsToCharge;
+            console.log("Setting input value to:", newValue);
+            input.value = ""; // Clear any autofill
+            input.value = newValue; // Force overwrite
+          }
+        })
+        .catch(err => console.error("Failed to load config:", err));
+    });
+  </script>
+</head>
+
+<body>
+  <h2>Charging Control v1.2</h2>
+
+  <div>
+    <p><strong>PV Output:</strong> <span id="pvWatts">--</span> W</p>
+    <p><strong>House Usage:</strong> <span id="houseWatts">--</span> W</p>
+    <p><strong>Net Surplus:</strong> <span id="netSurplus">--</span> W</p>
+    <p><strong>Aggressiveness:</strong> <span id="aggressiveness">--</span></p>
+  </div>
+
+  <h3>Settings</h3>
+  <form id="chargingSettingsForm" onsubmit="event.preventDefault(); saveChargingSettings();">
+    <label for="minimumPVWattsToCharge">Minimum PV to Charge (W):</label>
+    <input type="number" id="minimumPVWattsToCharge" name="minimumPVWattsToCharge" autocomplete="off">
+    <button type="submit">Save Settings</button>
+  </form>
+</body>
+</html>

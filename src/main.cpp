@@ -54,6 +54,7 @@ Serial.println("IP address: " + WiFi.localIP().toString());
   }
 
   loadChargingSettings(); // Make sure this comes after LittleFS.begin()
+  
 
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 

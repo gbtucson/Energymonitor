@@ -41,6 +41,11 @@ String getChargingStatusJson() {
   doc["chargingRate"] = chargingRate;
   doc["minimumPVWattsToCharge"] = minimumPVWattsToCharge;
 
+  // Optional: add derived fields for frontend display
+  doc["netSurplus"] = 0; // Placeholder, update with real telemetry if available
+  doc["aggressiveness"] = (chargingRate >= 30) ? "aggressive" :
+                          (chargingRate >= 15) ? "moderate" : "conservative";
+
   String output;
   serializeJson(doc, output);
   return output;
@@ -48,47 +53,67 @@ String getChargingStatusJson() {
 
 // Accepts JSON payload to update timer settings and persistent config
 bool updateChargingSettings(const String& json) {
+  Serial.println("[updateChargingSettings] Received JSON:");
+  Serial.println(json);
+
   StaticJsonDocument<512> doc;
   DeserializationError err = deserializeJson(doc, json);
-  if (err) return false;
+  if (err) {
+    Serial.print("[updateChargingSettings] JSON parse failed: ");
+    Serial.println(err.c_str());
+    return false;
+  }
 
-  if (doc.containsKey("chargingDurationMs")) {
-    chargingDurationMs = doc["chargingDurationMs"];
-  }
-  if (doc.containsKey("chargingRate")) {
-    chargingRate = doc["chargingRate"];
-  }
   if (doc.containsKey("minimumPVWattsToCharge")) {
     minimumPVWattsToCharge = doc["minimumPVWattsToCharge"];
+    Serial.print("[updateChargingSettings] Parsed minimumPVWattsToCharge: ");
+    Serial.println(minimumPVWattsToCharge);
   }
 
-  chargingStartTime = millis();
-  chargingTimerActive = true;
-
-  // Save persistent settings
-  File f = LittleFS.open("/chargingconfig.json", "w");
-  if (f) {
-    StaticJsonDocument<256> out;
-    out["minimumPVWattsToCharge"] = minimumPVWattsToCharge;
-    serializeJson(out, f);
-    f.close();
+  File f = LittleFS.open("/charging-settings.json", "w");
+  if (!f) {
+    Serial.println("[updateChargingSettings] Failed to open file for writing.");
+    return false;
   }
 
+  StaticJsonDocument<256> out;
+  out["minimumPVWattsToCharge"] = minimumPVWattsToCharge;
+  serializeJson(out, f);
+  f.close();
+
+  Serial.println("[updateChargingSettings] File written successfully.");
   return true;
 }
 
+
 // Load settings from flash on boot
 void loadChargingSettings() {
-  File f = LittleFS.open("/chargingconfig.json", "r");
-  if (!f) return;
+  Serial.println("[loadChargingSettings] Attempting to open /charging-settings.json");
+
+  File f = LittleFS.open("/charging-settings.json", "r");
+  if (!f) {
+    Serial.println("[loadChargingSettings] File not found.");
+    return;
+  }
+
+  Serial.println("[loadChargingSettings] File opened successfully.");
 
   StaticJsonDocument<256> doc;
   DeserializationError err = deserializeJson(doc, f);
   f.close();
-  if (err) return;
+
+  if (err) {
+    Serial.print("[loadChargingSettings] JSON parse failed: ");
+    Serial.println(err.c_str());
+    return;
+  }
 
   if (doc.containsKey("minimumPVWattsToCharge")) {
     minimumPVWattsToCharge = doc["minimumPVWattsToCharge"];
+    Serial.print("[loadChargingSettings] Loaded minimumPVWattsToCharge: ");
+    Serial.println(minimumPVWattsToCharge);
+  } else {
+    Serial.println("[loadChargingSettings] Key 'minimumPVWattsToCharge' not found.");
   }
 }
 

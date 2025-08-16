@@ -4,7 +4,7 @@
 #include "relaycontrol.h"
 #include "schedule_handler.h"
 #include "energylogic.h"
-// #include "charginglogic.h" // Temporarily disabled due to early crash risk
+#include "charginglogic.h" // Temporarily disabled due to early crash risk
 
 void handleClampConfigLoad(AsyncWebServerRequest* request) {
   request->send(200, "application/json", "{}"); // Stub: replace with actual clamp config
@@ -182,6 +182,64 @@ void registerWebRoutes(AsyncWebServer& server) {
 
   server.serveStatic("/", LittleFS, "/");
 
+  server.on("/charging-status.json", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String json = getChargingStatusJson();
+    request->send(200, "application/json", json);
+  });
+
+  server.on("/charging-settings.json", HTTP_POST, [](AsyncWebServerRequest *request) {}, nullptr,
+  [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+    String body((char*)data, len);
+    bool success = updateChargingSettings(body);
+    request->send(200, "application/json", success ? "{\"status\":\"ok\"}" : "{\"status\":\"error\"}");
+  });
+
+  server.on("/charging-settings.json", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (!LittleFS.exists("/charging-settings.json")) {
+      request->send(404, "application/json", "{\"error\":\"No config found\"}");
+      return;
+    }
+    request->send(LittleFS, "/charging-settings.json", "application/json");
+  });
+
+  server.on("/api/save-settings", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+  [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+    Serial.println("[save-settings] Received POST");
+
+    DynamicJsonDocument doc(256);
+    DeserializationError error = deserializeJson(doc, data);
+    if (error) {
+      Serial.println("[save-settings] JSON parse error");
+      request->send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+      return;
+    }
+
+      if (!doc.containsKey("minimumPVWattsToCharge") || !doc["minimumPVWattsToCharge"].is<int>()) {
+      Serial.println("[save-settings] Invalid or missing 'minimumPVWattsToCharge'");
+      request->send(400, "application/json", "{\"error\":\"Missing or invalid 'minimumPVWattsToCharge'\"}");
+      return;
+    }
+
+    File file = LittleFS.open("/charging-settings.json", "w");
+    if (!file) {
+      Serial.println("[save-settings] Failed to open file for writing");
+      request->send(500, "application/json", "{\"error\":\"Failed to open file\"}");
+      return;
+    }
+
+    size_t written = serializeJson(doc, file);
+    file.close();
+
+    if (written == 0) {
+      Serial.println("[save-settings] Failed to write JSON");
+      request->send(500, "application/json", "{\"error\":\"Failed to write JSON\"}");
+      return;
+    }
+
+    Serial.println("[save-settings] Settings saved successfully");
+    request->send(200, "application/json", "{\"status\":\"ok\"}");
+  });
+
   server.on("/status.json", HTTP_GET, [](AsyncWebServerRequest *request){
     EnergyData data = getLatestEnergyData();
     bool isPeak = (getRelayStateFromSchedule("/schedule.json") == "OFF");
@@ -199,12 +257,7 @@ void registerWebRoutes(AsyncWebServer& server) {
     doc["scheduleMode"] = isPeak ? "Peak" : "Regular";
     doc["chargeRateWatts"] = chargeRate;
 
-    // Commented out due to missing charginglogic.h
-    // doc["chargingTimerActive"] = isChargingTimerActive();
-    // doc["chargingTimeRemaining"] = isChargingTimerActive() ?
-    //     (getChargingStartTime() + getChargingDurationMs() - millis()) / 1000 : 0;
-
-    //  Temporary stub values
+    // Stubbed due to missing charginglogic.h
     doc["chargingTimerActive"] = false;
     doc["chargingTimeRemaining"] = 0;
 
